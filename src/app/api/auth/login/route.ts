@@ -3,10 +3,10 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/auth";
 import { createSession } from "@/lib/session";
+import { getDB } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
-  const env = process.env as any;
-  const DB = env.DB as D1Database;
+  const DB = await getDB();
   if (!DB) return NextResponse.json({ error: "DB not configured" }, { status: 500 });
 
   const { email, password } = await req.json() as any;

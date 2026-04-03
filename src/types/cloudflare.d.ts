@@ -17,3 +17,10 @@ declare interface D1Database {
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
   exec(query: string): Promise<D1Result>;
 }
+
+declare interface CloudflareEnv {
+  DB: D1Database;
+  DEEPSEEK_API_KEY?: string;
+  JWT_SECRET?: string;
+  ASSETS?: Fetcher;
+}

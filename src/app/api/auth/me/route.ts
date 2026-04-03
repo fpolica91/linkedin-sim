@@ -2,10 +2,10 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/session";
+import { getDB } from "@/lib/db";
 
 export async function GET() {
-  const env = process.env as any;
-  const DB = env.DB as D1Database;
+  const DB = await getDB();
   if (!DB) return NextResponse.json({ error: "DB not configured" }, { status: 500 });
 
   const userId = await getSessionUser();

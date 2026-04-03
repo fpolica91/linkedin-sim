@@ -70,8 +70,9 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
 
   // Check plan for rate limiting
-  const env = process.env as any;
-  const DB = env.DB as D1Database;
+  const { getDB, getEnv } = await import("@/lib/db");
+  const DB = await getDB();
+  const cfEnv = await getEnv();
   const user = DB ? await DB.prepare("SELECT plan FROM users WHERE id = ?").bind(userId).first() : null;
   const plan = (user as any)?.plan || "free";
 
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Post content is required" }, { status: 400 });
   }
 
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiKey = (cfEnv as any).DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "AI not configured" }, { status: 500 });
 
   const client = new OpenAI({ apiKey, baseURL: "https://api.deepseek.com" });

@@ -17,7 +17,15 @@ function base64urlDecode(str: string): string {
 }
 
 async function getSigningKey(): Promise<CryptoKey> {
-  const secret = process.env.JWT_SECRET || "change-me-in-production";
+  let secret = process.env.JWT_SECRET;
+  if (!secret) {
+    try {
+      const { getEnv } = await import("@/lib/db");
+      const env = await getEnv();
+      secret = env.JWT_SECRET;
+    } catch {}
+  }
+  secret = secret || "change-me-in-production";
   const encoder = new TextEncoder();
   return crypto.subtle.importKey("raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
 }
